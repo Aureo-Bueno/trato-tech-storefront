@@ -1,70 +1,150 @@
-# Getting Started with Create React App
+# Trato Tech
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Storefront demo built with React, TypeScript, Vite, and Redux Toolkit. It includes category browsing, debounced search with React transitions, cart management, and a mock JSON API.
+
+## Tech Stack
+
+- **React 19 + TypeScript**
+- **Vite** (dev server/build) with `@vitejs/plugin-react` and `vite-plugin-svgr`
+- **Redux Toolkit + React Redux** (typed hooks, memoized selectors, async thunks)
+- **React Router**
+- **SCSS Modules**
+- **json-server** (mock API from `db.json`)
+- **Nginx + Docker** (production-style static serving + `/api` proxy)
+
+## Features
+
+- Home with category listing
+- Category page with search/filtering
+- Shopping cart with quantity and total summary
+- Debounced search input and deferred/transition-based filtering for responsive UI
+- Memoized Redux selectors and memoized components to reduce unnecessary re-renders
+- Security headers/CSP configured in Vite dev/preview and Nginx
+
+## React 19 Features in Code
+
+- **`useOptimistic`** (`src/components/Item/index.tsx`): optimistic UI for favorite toggling and add/remove cart state, updated inside a transition before the Redux dispatch for immediate feedback.
+- **`useActionState`** (`src/pages/Cart/index.tsx`): async checkout handled as a form Action (`<form action={formAction}>`) with resulting state for success/error feedback and cart reset.
+- **`useFormStatus`** (`src/pages/Cart/CheckoutButton.tsx`): submit button reads the parent form pending state to disable itself and show processing feedback without prop drilling.
+- **`use` + `Suspense`** (`src/pages/Home/index.tsx`, `src/services/resources.ts`): categories are loaded via a cached Promise resource consumed with `use(...)` inside a `<Suspense>` boundary, then synced to the Redux store; items continue to be fetched on mount.
+- **`ref` as a prop** (`src/components/Search/SearchInput.tsx`, `src/components/Search/index.tsx`): the search input accepts `ref` as a regular prop (no `forwardRef`) so the parent can focus it directly.
+- **Concurrent rendering**: `useTransition` and `useDeferredValue` keep search/filter interactions responsive while derived lists update.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (project Docker image uses Node 26)
+- npm, yarn, or pnpm
+
+### Install
+
+```bash
+npm install
+```
+
+### Run locally
+
+Start the mock API (port `3001`):
+
+```bash
+npm run db:watch
+```
+
+Start the Vite dev server (port `3000`, proxies `/api` to `http://localhost:3001`):
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+### Build and preview
+
+```bash
+npm run build
+npm run preview
+```
+
+## Docker
+
+Build and run with Docker Compose (web served by Nginx, API by json-server):
+
+```bash
+docker compose up -d --build
+```
+
+- App: [http://localhost:8080](http://localhost:8080)
+- API: [http://localhost:3001](http://localhost:3001)
+
+Nginx serves the built SPA from `dist`, applies security headers/CSP, and proxies `/api/` to the `api` service.
 
 ## Available Scripts
 
-In the project directory, you can run:
+- `npm run dev` — start Vite dev server
+- `npm run build` — type-check (`tsc`) and build for production
+- `npm run preview` — preview the production build
+- `npm run db:watch` — run json-server watching `db.json` on port `3001`
 
-### `yarn start`
+## Project Structure
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `yarn test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```text
+.
+├── db.json
+├── docker-compose.yml
+├── Dockerfile
+├── index.html
+├── nginx.conf
+├── package.json
+├── tsconfig.json
+├── vite.config.ts
+├── public/
+│   └── assets/
+│       ├── categorias/
+│       │   ├── header/
+│       │   └── thumbnail/
+│       └── itens/
+└── src/
+    ├── assets/
+    ├── components/
+    │   ├── DefaultLayout/
+    │   ├── Footer/
+    │   ├── Header/
+    │   │   ├── TitleWithImage/
+    │   │   └── TitleWithoutImage/
+    │   ├── Item/
+    │   ├── Navbar/
+    │   └── Search/
+    │       ├── index.tsx
+    │       ├── Search.module.scss
+    │       └── SearchInput.tsx
+    ├── hooks/
+    │   └── useDebounce.ts
+    ├── pages/
+    │   ├── Cart/
+    │   │   ├── Cart.module.scss
+    │   │   ├── CheckoutButton.tsx
+    │   │   └── index.tsx
+    │   ├── Category/
+    │   └── Home/
+    ├── services/
+    │   ├── index.ts
+    │   ├── resources.ts
+    │   ├── useGetCategories.ts
+    │   └── useGetItems.ts
+    ├── store/
+    │   ├── hooks.ts
+    │   ├── index.ts
+    │   ├── selectors.ts
+    │   └── slices/
+    │       ├── cart.ts
+    │       ├── categories.ts
+    │       ├── items.ts
+    │       └── search.ts
+    ├── styles/
+    │   └── _breakpoints.scss
+    ├── index.css
+    ├── main.tsx
+    ├── routes.tsx
+    └── vite-env.d.ts
+```

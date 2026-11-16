@@ -1,15 +1,15 @@
 @import 'styles/breakpoints';
 
 .header {
-  background-image: url('/assets/fundo.png');
+  background-color: var(--color-dark);
+  background-image: linear-gradient(rgba(4, 24, 51, 0.55), rgba(4, 24, 51, 0.55)), url('/assets/fundo.png');
   background-repeat: no-repeat;
   background-size: cover;
-  padding: 150px 120px 100px 120px;
+  background-position: center;
+  padding: 140px 24px 80px;
   position: relative;
-  @media(max-width: $tablet) {
-    padding-top: 250px;
-  }
-  @media(max-width: $mobile-sm) {
-    padding: 250px 50px 100px 50px;
+
+  @media (max-width: $tablet) {
+    padding: 220px 20px 60px;
   }
 }

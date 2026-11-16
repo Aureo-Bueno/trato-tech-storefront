@@ -1,0 +1,28 @@
+.search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #fff;
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+  padding: 10px 16px;
+  width: 100%;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  outline: none;
+  font-size: 0.95rem;
+  color: var(--color-text);
+
+  &::placeholder {
+    color: var(--color-muted);
+  }
+}
+
+.status {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  white-space: nowrap;
+}

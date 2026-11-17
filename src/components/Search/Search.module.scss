@@ -21,6 +21,24 @@
   }
 }
 
+.clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: var(--color-muted);
+  cursor: pointer;
+  font-size: 1.15rem;
+  line-height: 1;
+
+  &:hover {
+    background-color: #eef2f8;
+    color: var(--color-dark);
+  }
+}
+
 .status {
   font-size: 0.8rem;
   color: var(--color-muted);

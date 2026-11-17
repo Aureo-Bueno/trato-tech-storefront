@@ -1,13 +1,14 @@
-import { useActionState, useDeferredValue, useMemo } from 'react';
+import { useActionState, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import Header from 'components/Header';
 import styles from './Cart.module.scss';
 import Item from 'components/Item';
-import CheckoutButton from './CheckoutButton';
+import CheckoutForm from './CheckoutForm';
+import type { CheckoutFormHandle } from './CheckoutForm';
 import { resetCart } from 'store/slices/cart';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { makeSelectFilteredCartItems } from 'store/selectors';
 
-type CheckoutState = { ok: boolean; error?: string } | null;
+type CheckoutState = { ok: boolean; error?: string; email?: string } | null;
 
 export default function Cart() {
   const dispatch = useAppDispatch();
@@ -16,19 +17,35 @@ export default function Cart() {
   const search = useAppSelector((state) => state.search);
   const deferredSearch = useDeferredValue(search);
   const isPending = deferredSearch !== search;
+  const checkoutRef = useRef<CheckoutFormHandle>(null);
+  const [reviewEmail, setReviewEmail] = useState<string | null>(null);
 
-  const checkoutAction = async (_previousState: CheckoutState): Promise<CheckoutState> => {
+  const checkoutAction = async (
+    _previousState: CheckoutState,
+    formData: FormData
+  ): Promise<CheckoutState> => {
     try {
       // simulate async checkout request
       await new Promise((resolve) => setTimeout(resolve, 500));
+      const email = String(formData.get('email') ?? '');
       dispatch(resetCart());
-      return { ok: true };
+      return { ok: true, email };
     } catch {
       return { ok: false, error: 'Checkout failed. Please try again.' };
     }
   };
 
   const [checkoutState, formAction] = useActionState(checkoutAction, null);
+
+  useEffect(() => {
+    if (checkoutState?.ok) checkoutRef.current?.reset();
+    if (checkoutState?.error) checkoutRef.current?.focus();
+  }, [checkoutState]);
+
+  const handleReview = () => {
+    const values = checkoutRef.current?.getValues();
+    setReviewEmail(values?.email ?? '');
+  };
 
   return (
     <div>
@@ -41,11 +58,24 @@ export default function Cart() {
             Subtotal: <strong> R$ {total.toFixed(2)} </strong>
           </span>
         </div>
-        <form action={formAction} className={styles.checkoutForm}>
-          <CheckoutButton disabled={items.length === 0} />
-        </form>
+        <div className={styles.review}>
+          <button type='button' className={styles.reviewButton} onClick={handleReview}>
+            Review order
+          </button>
+          {reviewEmail !== null && (
+            <span className={styles.reviewEmail}>
+              {reviewEmail ? `Receipt email: ${reviewEmail}` : 'Receipt email not filled yet.'}
+            </span>
+          )}
+        </div>
+        <CheckoutForm ref={checkoutRef} action={formAction} disabled={items.length === 0} />
         {checkoutState?.error && <p className={styles.error}>{checkoutState.error}</p>}
-        {checkoutState?.ok && <p className={styles.success}>Checkout completed successfully.</p>}
+        {checkoutState?.ok && (
+          <p className={styles.success}>
+            Checkout completed successfully
+            {checkoutState.email ? `. Receipt sent to ${checkoutState.email}.` : '.'}
+          </p>
+        )}
       </div>
     </div>
   );

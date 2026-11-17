@@ -16,23 +16,29 @@ const cspDirectives = [
   "frame-ancestors 'none'",
 ].join('; ');
 
+const devCspDirectives = cspDirectives.replace(
+  "script-src 'self'",
+  "script-src 'self' 'unsafe-inline'"
+);
+
 export default defineConfig({
   plugins: [react(), svgr()],
   resolve: {
     alias: {
-      components: path.resolve(__dirname, 'src/components'),
-      pages: path.resolve(__dirname, 'src/pages'),
-      store: path.resolve(__dirname, 'src/store'),
-      services: path.resolve(__dirname, 'src/services'),
-      hooks: path.resolve(__dirname, 'src/hooks'),
-      assets: path.resolve(__dirname, 'src/assets'),
-      styles: path.resolve(__dirname, 'src/styles'),
+      components: path.resolve(import.meta.dirname, 'src/components'),
+      pages: path.resolve(import.meta.dirname, 'src/pages'),
+      store: path.resolve(import.meta.dirname, 'src/store'),
+      services: path.resolve(import.meta.dirname, 'src/services'),
+      hooks: path.resolve(import.meta.dirname, 'src/hooks'),
+      assets: path.resolve(import.meta.dirname, 'src/assets'),
+      styles: path.resolve(import.meta.dirname, 'src/styles'),
+      routes: path.resolve(import.meta.dirname, 'src/routes.tsx'),
     },
   },
   server: {
     port: 3000,
     headers: {
-      'Content-Security-Policy': cspDirectives,
+      'Content-Security-Policy': devCspDirectives,
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
@@ -54,6 +60,13 @@ export default defineConfig({
       'X-Frame-Options': 'DENY',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
       'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+    },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
     },
   },
   build: {

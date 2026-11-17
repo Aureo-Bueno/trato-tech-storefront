@@ -1,4 +1,4 @@
-@import 'styles/breakpoints';
+@use 'styles/breakpoints' as *;
 
 .cart {
   max-width: 900px;
@@ -36,6 +36,53 @@
 
 .checkoutForm {
   align-self: flex-end;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+
+  input {
+    min-width: 260px;
+    padding: 10px 12px;
+    border: 1px solid #d7dee8;
+    border-radius: 8px;
+    background-color: #fff;
+    color: var(--color-text);
+
+    &:focus {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 1px;
+    }
+  }
+}
+
+.review {
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.reviewButton {
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.reviewEmail {
+  color: var(--color-muted);
+  font-size: 0.9rem;
 }
 
 .finish {
